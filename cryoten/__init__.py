@@ -1,8 +1,8 @@
 # **************************************************************************
 # *
-# * Authors:     you (you@yourinstitution.email)
+# * Authors:     Javier Sanchez (scipion@cnb.csic.es)
 # *
-# * your institution
+# * CNB - CSIC
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ from cryoten.constants import *
 
 __version__ = "0.1"  # plugin version
 _logo = "icon.png"
-_references = ['you2019']
+_references = ['javiersanchez2024']
 
 
 class Plugin(pwem.Plugin):
@@ -41,8 +41,8 @@ class Plugin(pwem.Plugin):
 
     @classmethod
     def _defineVariables(cls):
-        cls._defineVar(MYPLUGIN_BINARY, "program")
-        cls._defineEmVar(MYPLUGIN_HOME, f"myplugin-{V1}")
+        cls._defineVar(CRYOTEN_BINARY, "program")
+        cls._defineEmVar(CRYOTEN_HOME, f"CRYOTEN-{V1}")
 
     @classmethod
     def getEnviron(cls):
@@ -63,7 +63,7 @@ class Plugin(pwem.Plugin):
     @classmethod
     def defineBinaries(cls, env):
         installCmds = [("make -j 4", "")]  # replace the target "" with e.g. "bin/myprogram"
-        env.addPackage('myplugin', version=V1,
+        env.addPackage('CRYOTEN', version=V1,
                        tar='void.tgz',
                        commands=installCmds,
                        neededProgs=cls.getDependencies(),
