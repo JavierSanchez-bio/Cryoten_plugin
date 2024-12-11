@@ -28,17 +28,12 @@ with open('requirements.txt') as f:
 setup(
     name='scipion-em-cryoten',  # Required
     version=__version__,  # Required
-    description='Wrappers to CryoTen',  # Required
+    description='Cryoten plugin for Scipion',  # Required
     long_description=long_description,  # Optional
     url='https://github.com/scipion-em/scipion-em-cryoten',  # Optional
-    author='Javier Sanchez',  # Optional
-    author_email='scipion@cnb.cnb.csic.es',  # Optional
-    keywords='scipion cryoem imageprocessing scipion-3.0 cryoten',  # Optional
-    classifiers=[  # Optional
-        'Development Status :: 3 - Alpha',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Programming Language :: Python :: 3'
-    ],
+    author='David Herreros',  # Optional
+    author_email='dherreros@cnb.csic.es',  # Optional
+    keywords='scipion cryoem imageprocessing scipion-3.0 datasimulation',  # Optional
     packages=find_packages(),
     install_requires=[requirements],
     project_urls={  # Optional
@@ -47,6 +42,6 @@ setup(
     },
     entry_points={'pyworkflow.plugin': 'cryoten = cryoten'},
     package_data={  # Optional
-       'cryoten': ['icon.png', 'protocols.conf'],
+       'cryoten': ['ccpem_logo.png', 'protocols.conf'],
     }
 )

@@ -1,67 +1,101 @@
-====================
-CryoTEN   plugin
-====================
+=======================
+Scipion template plugin
+=======================
 
-This plugin provide a wrapper for `CryoTEN <https://github.com/jianlin-cheng/cryoten>`_ which allows *de novo* atomic modelling
+This is a template plugin for **scipion**
 
+==========================
+Steps to adapt this plugin
+==========================
 
-Installation
-------------
+IMPORTANT: To simplify the instructions all the commands would refer to an hypothetical new plugin name called "coolem".
+Note that you must replace "coolem" by your plugin name.
 
-a) Stable version
-
-.. code-block::
-
-    scipion3 installp -p scipion-em-cryoten
-
-b) Developer's version
-
-    * download repository
-
-    .. code-block::
-
-        git clone https://github.com/scipion-em/scipion-em-cryoten.git
-
-    * install
-
-    .. code-block::
-
-        scipion3 installp -p path_to_scipion-em-cryoten --devel
-
-CryoTen will be installed automatically with the plugin using a Conda environment.
-
-
-Configuration variables
-.......................
-
-There are some variables related to the cryoten installation. If you have installed
-cryoten within Scipion, you may define `CRYOTEN_ENV_ACTIVATION` for specifying
-how to activate the environment. This variable with be used together with the general
-conda activation to generate the final cryoten command. For example:
+**Clone it:**
 
 .. code-block::
 
-    CRYOTEN_ENV_ACTIVATION = conda activate cryoten
+    git clone https://github.com/scipion-em/scipion-em-template.git scipion-em-coolem
 
-If this variable is not defined, a default value will be provided that will work if the
-latest version is installed.
-
-If cryoten is installed already outside Scipion, one could define `CRYOTEN_ACTIVATION`.
-This variable will provide an activation (or load) command that can be anything and the Scipion
-conda activate will not be prepended. For example (loading cryoten as a module):
+**Reset the git repo**
 
 .. code-block::
 
-    CRYOTEN_ACTIVATION = module load cryoten/main
+    cd scipion-em-coolem
+    rm -rf .git
+    git init
 
-If you need to use CUDA different from the one used during Scipion installation (defined by *CUDA_LIB*), you can add *CRYOTEN_CUDA_LIB* variable to the config file.
+**Empty CHANGES.txt**
 
-Protocols
----------
+.. code-block::
 
-* Model builder
+    rm CHANGES.txt && touch CHANGES.txt
 
-Tests
------
+**Rename "myplugin" to coolem**
 
-* scipion3 tests cryoten.tests.tests_cryoten.TestCryoTen
+.. code-block::
+
+    mv myplugin coolem
+    
+
+**Tidy up imports**
+
+ IDE refactorization should rename at once the classes and the imports. Search in your IDE for "myplugin" and replace by *"coolem"*
+
+- coolem/protocols/protocol_hello_world.py:
+ class MyPluginPrefixHelloWorld --> class CoolemPrefixHelloWorld
+
+- coolem/protocol/__init__.py:
+ from .protocol_hello_world import MyPluginPrefixHelloWorld --> from .protocol_hello_world import CoolemPrefixHelloWorld
+
+- coolem/wizards/wizard_hello_world.py:
+ _targets = [(MyPluginPrefixHelloWorld, ['message'])]  -->     _targets = [(CoolemPrefixHelloWorld, ['message'])]
+ class MyPluginPrefixHelloWorldWizard --> class CoolemPrefixHelloWorldWizard
+
+- coolem/wizards/__init__.py:
+ from .wizard_hello_world import MyPluginPrefixHelloWorldWizard  --> from .wizard_hello_world import CoolemPrefixHelloWorldWizard
+
+- protocols.conf: rename MyPluginPrefixHelloWorld --> CoolemPrefixHelloWorld
+
+
+- setup.py: Update almost all values: name, description, ... Be sure to update package data
+.. code-block::
+
+    package_data={  # Optional
+       'coolem': ['icon.png', 'protocols.conf'],
+    }
+
+  and the entry point
+.. code-block::
+
+    entry_points={
+        'pyworkflow.plugin': 'coolem = coolem'
+    }
+
+**Install the plugin in devel mode**
+
+.. code-block::
+
+    scipion3 installp -p /home/me/scipion-em-coolem --devel
+
+If installation fails, you can access pip options like:
+
+.. code-block::
+
+    scipion3 python -m pip ... (list, install, uninstall)
+    
+
+**Customize it**
+
+Replace icon.png with your logo and update the bibtex.py with your reference.
+
+Get rid of this content and keep the readme informative
+
+
+**Repository**
+
+To create the repository, following those guide depending the platform:
+
+- GitHub: https://docs.github.com/en/get-started/quickstart/create-a-repo
+- GitLab https://docs.gitlab.com/ee/user/project/repository/
+- Bitbucket https://support.atlassian.com/bitbucket-cloud/docs/create-a-git-repository/

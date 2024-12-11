@@ -1,4 +1,4 @@
 include *.txt
 include *.rst
 include LICENSE
-include cryoten/protocols.conf
+include myplugin/protocols.conf

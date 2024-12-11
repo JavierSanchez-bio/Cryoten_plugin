@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 # **************************************************************************
 # *
-# * Authors:     Javier Sanchez (scipion@cnb.csic.es)
+# * Authors:     you (you@yourinstitution.email)
 # *
 # * your institution
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
-# * the Free Software Foundation; either version 3 of the License, or
+# * the Free Software Foundation; either version 2 of the License, or
 # * (at your option) any later version.
 # *
 # * This program is distributed in the hope that it will be useful,
@@ -26,11 +26,18 @@
 # **************************************************************************
 
 """
-@article {Selvaraj2024,
-    author = {Selvaraj, Joel and Wang, Liguo and Cheng, Jianlin}, 
-    title = {CryoTEN: Efficiently Enhancing Cryo-EM Density Maps Using Transformers}, 
-    year = {2024}, 
-    doi = {10.1101/2024.09.06.611715}, 
-    URL = {https://www.biorxiv.org/content/early/2024/09/11/2024.09.06.611715}, 
-    journal = {bioRxiv}
+@article{you2019,
+title = "Title of your paper ",
+journal = "...",
+volume = "...",
+number = ".",
+pages = "1 - 6",
+year = "2019",
+issn = "0000-1111",
+doi = "https://dx.doi.org/xxxxx/xxxxx",
+url = "https://www.url",
+author = "you and your team",
+keywords = "Single particle analysis Tomography",
 }
+
+"""

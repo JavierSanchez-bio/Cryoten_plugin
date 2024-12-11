@@ -2,7 +2,7 @@ from pyworkflow.gui import ListTreeProviderString, dialog
 from pyworkflow.object import String
 from pyworkflow.wizard import Wizard
 
-from myplugin.protocols import MyPluginPrefixHelloWorld
+from cryoten.protocols import CryotenPrefixHelloWorld
 
 
 class CryotenPrefixHelloWorldWizard(Wizard):
