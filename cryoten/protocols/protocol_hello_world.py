@@ -1,56 +1,26 @@
 # -*- coding: utf-8 -*-
 # **************************************************************************
-# *
-# * Authors:     you (you@yourinstitution.email)
-# *
-# * your institution
-# *
-# * This program is free software; you can redistribute it and/or modify
-# * it under the terms of the GNU General Public License as published by
-# * the Free Software Foundation; either version 2 of the License, or
-# * (at your option) any later version.
-# *
-# * This program is distributed in the hope that it will be useful,
-# * but WITHOUT ANY WARRANTY; without even the implied warranty of
-# * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# * GNU General Public License for more details.
-# *
-# * You should have received a copy of the GNU General Public License
-# * along with this program; if not, write to the Free Software
-# * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-# * 02111-1307  USA
-# *
-# *  All comments concerning this program package may be sent to the
-# *  e-mail address 'you@yourinstitution.email'
-# *
-# **************************************************************************
-
 
 """
 Describe your python module here:
-This module will provide the traditional Hello world example
+This module will run the provided shell commands.
 """
-from enum import Enum
-
+import os
+import subprocess
 from pyworkflow.constants import BETA
 import pyworkflow.protocol.params as params
 from pyworkflow.utils import Message
-from pyworkflow.object import Integer
 from pwem.protocols import EMProtocol
-
-
-class outputs(Enum):
-    count = Integer
+from pwem.objects import Volume  # Import the Volume class to define the output
 
 
 class CryotenPrefixHelloWorld(EMProtocol):
     """
-    This protocol will print hello world in the console
+    This protocol will run the provided shell commands.
     IMPORTANT: Classes names should be unique, better prefix them
     """
-    _label = 'Hello world'
+    _label = 'enhance map'
     _devStatus = BETA
-    _possibleOutputs = outputs
 
     # -------------------------- DEFINE param functions ----------------------
     def _defineParams(self, form):
@@ -58,69 +28,95 @@ class CryotenPrefixHelloWorld(EMProtocol):
         Params:
             form: this is the form to be populated with sections and params.
         """
-        # You need a params to belong to a section:
         form.addSection(label=Message.LABEL_INPUT)
-        form.addParam('message', params.StringParam,
-                      default='Hello world!',
-                      label='Message', important=True,
-                      help='What will be printed in the console.')
 
-        form.addParam('times', params.IntParam,
-                      validators=[params.Positive],
-                      default=10,
-                      label='Times', important=True,
-                      help='Times the message will be printed.')
+        form.addParam('condaPath', params.StringParam,
+                      default='/home/javier/miniconda/etc/profile.d/conda.sh',
+                      label='Conda Path',
+                      help='Path to the conda.sh script.')
 
-        form.addParam('previousCount', params.IntParam,
-                      default=0,
-                      allowsNull=True,
-                      label='Previous count',
-                      help='Previous count of printed messages',
-                      allowsPointers=True)
+        form.addParam('projectPath', params.StringParam,
+                      default='/home/javier/cryoten',
+                      label='Path to cryoten',
+                      help='Path to the Cryoten software folder.')
+
+        form.addParam('outputFile', params.StringParam,
+                      default='/home/javier/cryoten/output/emd_1111_cryoten.mrc',
+                      label='Output File',
+                      help='Path to the output file (.mrc).')
+
+        form.addParam('inputVolume', params.PointerParam,
+                      label='Input Volume',
+                      pointerClass='Volume',
+                      help='Select the volume to be processed.')
 
     # --------------------------- STEPS functions ------------------------------
     def _insertAllSteps(self):
-        # Insert processing steps
-        self._insertFunctionStep(self.greetingsStep)
+        self._insertFunctionStep(self.runShellCommandsStep)
         self._insertFunctionStep(self.createOutputStep)
 
-    def greetingsStep(self):
-        # say what the parameter says!!
-        for time in range(0, self.times.get()):
-            print(self.message)
+    def runShellCommandsStep(self):
+        def run_command(command):
+            """Run a shell command and handle any errors."""
+            process = subprocess.run(command, shell=True, executable='/bin/bash', stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE)
+            stdout = process.stdout.decode('utf-8')
+            stderr = process.stderr.decode('utf-8')
+            if process.returncode != 0:
+                raise Exception(f"Command '{command}' failed with error: {stderr}")
+            return stdout, stderr
+
+        try:
+            # Get the file path of the input volume
+            inputFilePath = self.inputVolume.get().getFileName()
+
+            # Get the base path of the Scipion project
+            basePath = self.getProject().getPath()
+
+            # Construct the full path
+            fullInputFilePath = os.path.join(basePath, inputFilePath)
+
+            # Print the full input file path for verification
+            print(f"Full input file path: {fullInputFilePath}")
+
+            # Construct the command
+            command = f"""
+                source {self.condaPath.get()} && \
+                conda activate cryoten_env && \
+                cd {self.projectPath.get()} && \
+                python eval.py {fullInputFilePath} {self.outputFile.get()}
+            """
+            print(f"Running command: {command}")
+
+            # Execute the command
+            stdout, stderr = run_command(command)
+
+            # Log the output and error messages
+            print(f"Command output: {stdout}")
+            print(f"Command error: {stderr}")
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
     def createOutputStep(self):
-        # register how many times the message has been printed
-        # Now count will be an accumulated value
-        timesPrinted = Integer(self.times.get() + self.previousCount.get())
-
-        self._defineOutputs(**{outputs.count.name: timesPrinted})
-        self._defineSourceRelation(self.message, timesPrinted)
+        """Create output volume and register it in Scipion."""
+        outputVolume = Volume()
+        outputVolume.setFileName(self.outputFile.get())
+        self._defineOutputs(outputVolume=outputVolume)
+        self._defineSourceRelation(self.inputVolume, outputVolume)
 
     # --------------------------- INFO functions -----------------------------------
     def _validate(self):
         errors = []
-
-        if self.times > 20:
-            errors.append("Cannot do more than 20 times.")
-
         return errors
 
     def _summary(self):
         """ Summarize what the protocol has done"""
         summary = []
-
-        if self.isFinished():
-            summary.append(f"This protocol has printed *{self.message}* {self.times} times.")
+        summary.append(f"Output volume: {self.outputFile.get()}")
         return summary
 
     def _methods(self):
         methods = []
-
-        if self.isFinished():
-            methods.append(f"{self.message} has been printed in this run {self.times} times.")
-            if self.previousCount.hasPointer():
-                methods.append("Accumulated count from previous runs were %i."
-                               " In total, %s messages has been printed."
-                               % (self.previousCount, self.count))
+        methods.append("This protocol enhances a map using the Cryoten software.")
         return methods

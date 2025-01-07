@@ -9,6 +9,8 @@ cryoten/bibtex.py
 cryoten/constants.py
 cryoten/protocols.conf
 cryoten/protocols/__init__.py
+cryoten/protocols/protocol_cryoten.py
+cryoten/protocols/protocol_hell.py
 cryoten/protocols/protocol_hello_world.py
 cryoten/tests/__init__.py
 cryoten/viewers/__init__.py
