@@ -1,101 +1,68 @@
-=======================
-Scipion template plugin
-=======================
+====================
+Cryoten  plugin
+====================
 
-This is a template plugin for **scipion**
+This plugin provide a wrapper for `Model angelo <https://github.com/3dem/model-angelo>`_ which allows *de novo* atomic modelling
 
-==========================
-Steps to adapt this plugin
-==========================
 
-IMPORTANT: To simplify the instructions all the commands would refer to an hypothetical new plugin name called "coolem".
-Note that you must replace "coolem" by your plugin name.
+Installation
+------------
 
-**Clone it:**
+a) Stable version
 
 .. code-block::
 
-    git clone https://github.com/scipion-em/scipion-em-template.git scipion-em-coolem
+    scipion3 installp -p scipion-em-cryoten
 
-**Reset the git repo**
+b) Developer's version
 
-.. code-block::
+    * download repository
 
-    cd scipion-em-coolem
-    rm -rf .git
-    git init
+    .. code-block::
 
-**Empty CHANGES.txt**
+        git clone https://github.com/scipion-em/scipion-em-cryoten.git
 
-.. code-block::
+    * install
 
-    rm CHANGES.txt && touch CHANGES.txt
+    .. code-block::
 
-**Rename "myplugin" to coolem**
+        scipion3 installp -p path_to_scipion-em-cryoten --devel
 
-.. code-block::
-
-    mv myplugin coolem
-    
-
-**Tidy up imports**
-
- IDE refactorization should rename at once the classes and the imports. Search in your IDE for "myplugin" and replace by *"coolem"*
-
-- coolem/protocols/protocol_hello_world.py:
- class MyPluginPrefixHelloWorld --> class CoolemPrefixHelloWorld
-
-- coolem/protocol/__init__.py:
- from .protocol_hello_world import MyPluginPrefixHelloWorld --> from .protocol_hello_world import CoolemPrefixHelloWorld
-
-- coolem/wizards/wizard_hello_world.py:
- _targets = [(MyPluginPrefixHelloWorld, ['message'])]  -->     _targets = [(CoolemPrefixHelloWorld, ['message'])]
- class MyPluginPrefixHelloWorldWizard --> class CoolemPrefixHelloWorldWizard
-
-- coolem/wizards/__init__.py:
- from .wizard_hello_world import MyPluginPrefixHelloWorldWizard  --> from .wizard_hello_world import CoolemPrefixHelloWorldWizard
-
-- protocols.conf: rename MyPluginPrefixHelloWorld --> CoolemPrefixHelloWorld
+Cryoten will be installed automatically with the plugin using a Conda environment.
 
 
-- setup.py: Update almost all values: name, description, ... Be sure to update package data
-.. code-block::
+Configuration variables
+.......................
 
-    package_data={  # Optional
-       'coolem': ['icon.png', 'protocols.conf'],
-    }
-
-  and the entry point
-.. code-block::
-
-    entry_points={
-        'pyworkflow.plugin': 'coolem = coolem'
-    }
-
-**Install the plugin in devel mode**
+There are some variables related to the model-angelo installation. If you have installed
+model-angelo within Scipion, you may define `MODEL_ANGELO_ENV_ACTIVATION` for specifying
+how to activate the environment. This variable with be used together with the general
+conda activation to generate the final model-angelo command. For example:
 
 .. code-block::
 
-    scipion3 installp -p /home/me/scipion-em-coolem --devel
+    MODEL_ANGELO_ENV_ACTIVATION = conda activate model_angelo
 
-If installation fails, you can access pip options like:
+If this variable is not defined, a default value will be provided that will work if the
+latest version is installed.
+
+If model-angelo is installed already outside Scipion, one could define `MODEL_ANGELO_ACTIVATION`.
+This variable will provide an activation (or load) command that can be anything and the Scipion
+conda activate will not be prepended. For example (loading model-angelo as a module):
 
 .. code-block::
 
-    scipion3 python -m pip ... (list, install, uninstall)
-    
+    MODEL_ANGELO_ACTIVATION = module load model-angelo/main
 
-**Customize it**
+If you need to use CUDA different from the one used during Scipion installation (defined by *CUDA_LIB*), you can add *MODEL_ANGELO_CUDA_LIB* variable to the config file.
 
-Replace icon.png with your logo and update the bibtex.py with your reference.
+Protocols
+---------
 
-Get rid of this content and keep the readme informative
+* Model builder
 
+Tests
+-----
 
-**Repository**
+* scipion3 tests cryoten.tests.tests_model_angelo.TestModelAngel
 
-To create the repository, following those guide depending the platform:
-
-- GitHub: https://docs.github.com/en/get-started/quickstart/create-a-repo
-- GitLab https://docs.gitlab.com/ee/user/project/repository/
-- Bitbucket https://support.atlassian.com/bitbucket-cloud/docs/create-a-git-repository/
