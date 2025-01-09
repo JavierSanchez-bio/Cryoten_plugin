@@ -22,6 +22,10 @@ class CryotenPrefixEnhace(EMProtocol):
     _label = 'enhance map'
     _devStatus = BETA
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.outputFilePath = None  # Initialize the outputFilePath attribute
+
     # -------------------------- DEFINE param functions ----------------------
     def _defineParams(self, form):
         """ Define the input parameters that will be used.
@@ -111,14 +115,23 @@ class CryotenPrefixEnhace(EMProtocol):
 
             # Save the output file path for the next step
             self.outputFilePath = outputFilePath
+            print(f"Output file path set to: {self.outputFilePath}")
 
         except Exception as e:
             print(f"An error occurred: {e}")
 
     def createOutputStep(self):
         """Create output volume and register it in Scipion."""
+        if not self.outputFilePath:
+            raise RuntimeError("Output file path is not set. Ensure runShellCommandsStep has been executed successfully.")
+
         outputVolume = Volume()
         outputVolume.setFileName(self.outputFilePath)
+
+        # Copy the voxel size from the input volume to the output volume
+        voxelSize = self.inputVolume.get().getSamplingRate()
+        outputVolume.setSamplingRate(voxelSize)
+
         self._defineOutputs(outputVolume=outputVolume)
         self._defineSourceRelation(self.inputVolume, outputVolume)
 
