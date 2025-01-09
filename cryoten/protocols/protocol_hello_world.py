@@ -14,7 +14,7 @@ from pwem.protocols import EMProtocol
 from pwem.objects import Volume  # Import the Volume class to define the output
 
 
-class CryotenPrefixHelloWorld(EMProtocol):
+class CryotenPrefixEnhace(EMProtocol):
     """
     This protocol will run the provided shell commands.
     IMPORTANT: Classes names should be unique, better prefix them
