@@ -31,8 +31,8 @@ setup(
     description='Cryoten plugin for Scipion',  # Required
     long_description=long_description,  # Optional
     url='https://github.com/scipion-em/scipion-em-cryoten',  # Optional
-    author='David Herreros',  # Optional
-    author_email='dherreros@cnb.csic.es',  # Optional
+    author='Javier Sanchez',  # Optional
+    author_email='scipion@cnb.csic.es',  # Optional
     keywords='scipion cryoem imageprocessing scipion-3.0 datasimulation',  # Optional
     packages=find_packages(),
     install_requires=[requirements],
@@ -42,6 +42,6 @@ setup(
     },
     entry_points={'pyworkflow.plugin': 'cryoten = cryoten'},
     package_data={  # Optional
-       'cryoten': ['ccpem_logo.png', 'protocols.conf'],
+       'cryoten': ['icon.png', 'protocols.conf'],
     }
 )
