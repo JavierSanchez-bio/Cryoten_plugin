@@ -2,12 +2,12 @@ from pyworkflow.gui import ListTreeProviderString, dialog
 from pyworkflow.object import String
 from pyworkflow.wizard import Wizard
 
-from cryoten.protocols import CryotenPrefixHelloWorld
+from cryoten.protocols import CryotenPrefixEnhace
 
 
-class CryotenPrefixHelloWorldWizard(Wizard):
+class CryotenPrefixEnhaceWizard(Wizard):
     # Dictionary to target protocol parameters
-    _targets = [(CryotenPrefixHelloWorld, ['message'])]
+    _targets = [(CryotenPrefixEnhace, ['message'])]
 
     def show(self, form, *params):
         # This are the greetings:
