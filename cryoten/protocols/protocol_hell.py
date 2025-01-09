@@ -30,6 +30,11 @@ class CryotenPrefixHelloWorld(EMProtocol):
         """
         form.addSection(label=Message.LABEL_INPUT)
 
+        form.addParam('outputFile', params.StringParam,
+                      default=os.path.expanduser('~/cryoten/output/emd_1111_cryoten.mrc'),
+                      label='Output File',
+                      help='Path to the output file (.mrc).')
+
         form.addParam('inputVolume', params.PointerParam,
                       label='Input Volume',
                       pointerClass='Volume',
@@ -84,21 +89,17 @@ class CryotenPrefixHelloWorld(EMProtocol):
             # Get the Scipion base path from an environment variable
             scipion_base_path = os.getenv('SCIPION_BASE_PATH', os.path.expanduser('~/scipion'))
 
+            print(f"Scipion path: {scipion_base_path}")
+
             # Construct the Cryoten path based on the Scipion base path
             cryotenPath = os.path.join(scipion_base_path, 'software/em/cryoten-1.0.0/cryoten')
-
-            # Construct the output file path
-            inputFileName = os.path.basename(inputFilePath)
-            print(f"Input file name: {inputFileName}")
-            outputFileName = os.path.splitext(inputFileName)[0] + '.mrc'
-            outputFilePath = os.path.join(cryotenPath, 'output', outputFileName)
 
             # Construct the command
             command = f"""
                 source {condaPath} && \
                 conda activate cryoten_env && \
                 cd {cryotenPath} && \
-                python eval.py {fullInputFilePath} {outputFilePath}
+                python eval.py {fullInputFilePath} {self.outputFile.get()}
             """
             print(f"Running command: {command}")
 
@@ -109,16 +110,13 @@ class CryotenPrefixHelloWorld(EMProtocol):
             print(f"Command output: {stdout}")
             print(f"Command error: {stderr}")
 
-            # Save the output file path for the next step
-            self.outputFilePath = outputFilePath
-
         except Exception as e:
             print(f"An error occurred: {e}")
 
     def createOutputStep(self):
         """Create output volume and register it in Scipion."""
         outputVolume = Volume()
-        outputVolume.setFileName(self.outputFilePath)
+        outputVolume.setFileName(self.outputFile.get())
         self._defineOutputs(outputVolume=outputVolume)
         self._defineSourceRelation(self.inputVolume, outputVolume)
 
@@ -130,7 +128,7 @@ class CryotenPrefixHelloWorld(EMProtocol):
     def _summary(self):
         """ Summarize what the protocol has done"""
         summary = []
-        summary.append(f"Output volume: {self.outputFilePath}")
+        summary.append(f"Output volume: {self.outputFile.get()}")
         return summary
 
     def _methods(self):

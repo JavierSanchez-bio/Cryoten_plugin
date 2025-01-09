@@ -1,8 +1,6 @@
 # **************************************************************************
 # *
-# * Authors:     David Herreros (dherreros@cnb.csic.es)
-# *
-# * National Centre for Biotechnology (CSIC)
+# * Authors:     Javier Sanchez (jsanchez@bio.org)
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
@@ -29,29 +27,12 @@ import pyworkflow.utils as pwutils
 import pwem
 import subprocess
 
-from cryoten.constants import *
-
-__version__ = "1.0.4"  # plugin version
+__version__ = "1.0.0"  # plugin version
 _logo = "icon.png"
-_references = ['cryoten2024']
+_references = ['cryoten2025']
 
-# For the installation
-driver_cuda_compatibility = {
-    "465": "11.3.0",
-    "470": "11.4.0",
-    "495": "11.5.0",
-    "510": "11.6.0",
-    "515": "11.7.0",
-    "520": "11.8.0",
-    "525": "12.0.0",
-    "530": "12.1.0",
-    "535": "12.2.0",
-    "540": "12.3.0",
-    "545": "12.4.0",
-    "550": "12.5.0",
-    "555": "12.6.0",  # Expected or approximated for newer releases
-}
-
+# Define V1 before using it
+V1 = "1.0.0"
 
 class Plugin(pwem.Plugin):
     _url = "https://github.com/scipion-em/scipion-em-cryoten"
@@ -59,11 +40,11 @@ class Plugin(pwem.Plugin):
 
     @classmethod
     def getEnvActivation(cls):
-        return f"conda activate cryoten-{V1}"
+        return f"conda activate cryoten_env"
 
     @classmethod
     def getEnviron(cls, gpuID=None):
-        """ Setup the environment variables needed to launch my program. """
+        """ Setup the environment variables needed to launch the program. """
         environ = pwutils.Environ(os.environ)
 
         if gpuID is not None:
@@ -72,51 +53,27 @@ class Plugin(pwem.Plugin):
         return environ
 
     @classmethod
-    def getcryotenProgram(cls, program):
-        cmd = '%s %s && cryoten %s' % (cls.getCondaActivationCmd(), cls.getEnvActivation(), program)
+    def getCryotenProgram(cls, program):
+        cmd = '%s %s && python %s' % (cls.getCondaActivationCmd(), cls.getEnvActivation(), program)
         return cmd
 
     @classmethod
     def getCommand(cls, program, args):
-        return cls.getcryotenProgram(program) + args
+        return cls.getCryotenProgram(program) + args
 
     @classmethod
     def defineBinaries(cls, env):
 
-        def getcryotenInstallationCommands():
-            nvidiaNVCC = False
-            try:
-                nvidiaDriverVer = subprocess.Popen(["nvidia-smi",
-                                                    "--query-gpu=driver_version",
-                                                    "--format=csv,noheader"],
-                                                   env=cls.getEnviron(),
-                                                   stdout=subprocess.PIPE
-                                                   ).stdout.read().decode('utf-8').split(".")[0]
-                nvidiaNVCC = subprocess.run(['nvcc', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            except (ValueError, TypeError, FileNotFoundError):
-                print("NVCC not found in your system, installing it in the environment...")
-
+        def getCryotenInstallationCommands():
             commands = cls.getCondaActivationCmd() + " "
-            if nvidiaNVCC:
-                commands += f"conda create -n cryoten-{V1} -c conda-forge fftw python=3.10 -y && "
-            else:
-                compatible_versions = [cuda for drv, cuda in driver_cuda_compatibility.items() if
-                                       drv <= nvidiaDriverVer]
-                cudaVersion = max(compatible_versions)
-                commands += (
-                    f"conda create -n cryoten-{V1} -c conda-forge -c nvidia/label/cuda-{cudaVersion} python=3.10 "
-                    f"fftw cuda={cudaVersion} -y && ")
-            commands += f"conda activate cryoten-{V1} && "
-            commands += "pip install cryoten && pip install openmm && "
-            commands += ("git clone https://gitlab.com/ccpem/ccpem-pipeliner.git && "
-                         "cd ccpem-pipeliner && git checkout bedbedbe183ad497dbaa82a638f210d316ba9bae && "
-                         "pip install -e . && cd .. && ")
-            commands += "touch cryoten_installed"
+            commands += "if [ ! -d cryoten ]; then git clone https://github.com/jianlin-cheng/cryoten; fi && "
+            commands += "cd cryoten && "
+            commands += "if [ ! -f cryoten.ckpt ]; then wget https://zenodo.org/records/12693785/files/cryoten.ckpt; fi && "
+            commands += "if [ ! -d /home/javier/miniconda/envs/cryoten_env ]; then conda env create -f environment.yaml; fi && "
+            commands += f"conda activate cryoten_env && "
+            commands += "mkdir -p output && "
+            commands += "touch ../cryoten_installed"
             return commands
 
-
-        installCmds = [(getcryotenInstallationCommands(), "cryoten_installed")]
-        env.addPackage('cryoten', version=V1,
-                       tar='void.tgz',
-                       commands=installCmds,
-                       default=True)
+        installCmds = [(getCryotenInstallationCommands(), "cryoten_installed")]
+        env.addPackage('cryoten', version=V1, tar='void.tgz', commands=installCmds, default=True)
