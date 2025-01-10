@@ -1,10 +1,29 @@
 # -*- coding: utf-8 -*-
 # **************************************************************************
+# *
+# * Authors:     Javier Sanchez (scipion@cnb.csic.es)
+# *
+# * This program is free software; you can redistribute it and/or modify
+# * it under the terms of the GNU General Public License as published by
+# * the Free Software Foundation; either version 2 of the License, or
+# * (at your option) any later version.
+# *
+# * This program is distributed in the hope that it will be useful,
+# * but WITHOUT ANY WARRANTY; without even the implied warranty of
+# * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# * GNU General Public License for more details.
+# *
+# * You should have received a copy of the GNU General Public License
+# * along with this program; if not, write to the Free Software
+# * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+# * 02111-1307  USA
+# *
+# *  All comments concerning this program package may be sent to the
+# *  e-mail address 'scipion@cnb.csic.es'
+# *
+# **************************************************************************
 
-"""
-Describe your python module here:
-This module will run the provided shell commands.
-"""
+
 import os
 import subprocess
 from pyworkflow.constants import BETA
@@ -16,7 +35,7 @@ from pwem.objects import Volume  # Import the Volume class to define the output
 
 class CryotenPrefixEnhace(EMProtocol):
     """
-    This protocol will run the provided shell commands.
+    This protocol will enhace the map using Cryoten software.
     IMPORTANT: Classes names should be unique, better prefix them
     """
     _label = 'enhance map'
