@@ -71,7 +71,6 @@ class Plugin(pwem.Plugin):
             commands += "if [ ! -f cryoten.ckpt ]; then wget https://zenodo.org/records/12693785/files/cryoten.ckpt; fi && "
             commands += "if [ ! -d /home/javier/miniconda/envs/cryoten_env ]; then conda env create -f environment.yaml; fi && "
             commands += f"conda activate cryoten_env && "
-            commands += "mkdir -p output && "
             commands += "touch ../cryoten_installed"
             return commands
 
