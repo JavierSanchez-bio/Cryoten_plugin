@@ -1,29 +1,3 @@
-# -*- coding: utf-8 -*-
-# **************************************************************************
-# *
-# * Authors:     Javier Sanchez (scipion@cnb.csic.es)
-# *
-# * This program is free software; you can redistribute it and/or modify
-# * it under the terms of the GNU General Public License as published by
-# * the Free Software Foundation; either version 2 of the License, or
-# * (at your option) any later version.
-# *
-# * This program is distributed in the hope that it will be useful,
-# * but WITHOUT ANY WARRANTY; without even the implied warranty of
-# * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# * GNU General Public License for more details.
-# *
-# * You should have received a copy of the GNU General Public License
-# * along with this program; if not, write to the Free Software
-# * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-# * 02111-1307  USA
-# *
-# *  All comments concerning this program package may be sent to the
-# *  e-mail address 'scipion@cnb.csic.es'
-# *
-# **************************************************************************
-
-
 import os
 import subprocess
 from pyworkflow.constants import BETA
@@ -35,7 +9,7 @@ from pwem.objects import Volume  # Import the Volume class to define the output
 
 class CryotenPrefixEnhace(EMProtocol):
     """
-    This protocol will enhace the map using Cryoten software.
+    This protocol will enhance the map using Cryoten software.
     IMPORTANT: Classes names should be unique, better prefix them
     """
     _label = 'enhance map'
@@ -93,10 +67,10 @@ class CryotenPrefixEnhace(EMProtocol):
             print(f"Input file path: {inputFilePath}")
 
             # Get the base path of the Scipion project
-            basePath = self.getProject().getPath()
+            projectPath = self.getProject().getPath()
 
             # Construct the full path
-            fullInputFilePath = os.path.join(basePath, inputFilePath)
+            fullInputFilePath = os.path.join(projectPath, inputFilePath)
 
             # Print the full input file path for verification
             print(f"Full input file path: {fullInputFilePath}")
@@ -110,11 +84,17 @@ class CryotenPrefixEnhace(EMProtocol):
             # Construct the Cryoten path based on the Scipion base path
             cryotenPath = os.path.join(scipion_base_path, 'software/em/cryoten-1.0.0/cryoten')
 
-            # Construct the output file path
+            # Get the run directory name dynamically
+            runPath = self._getPath()
+            runDirName = os.path.basename(runPath)
+            extraPath = os.path.join(projectPath, 'Runs', runDirName, 'extra')
+            print(f"Extra path: {extraPath}")
+
+            # Construct the output file path dynamically based on the extraPath
             inputFileName = os.path.basename(inputFilePath)
             print(f"Input file name: {inputFileName}")
             outputFileName = os.path.splitext(inputFileName)[0] + '.mrc'
-            outputFilePath = os.path.join(cryotenPath, 'output', outputFileName)
+            outputFilePath = os.path.join(extraPath, outputFileName)
 
             # Construct the command
             command = f"""
@@ -162,7 +142,6 @@ class CryotenPrefixEnhace(EMProtocol):
     def _summary(self):
         """ Summarize what the protocol has done"""
         summary = []
-        summary.append(f"Output volume: {self.outputFilePath}")
         return summary
 
     def _methods(self):
