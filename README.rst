@@ -64,5 +64,5 @@ Protocols
 Tests
 -----
 
-* scipion3 tests cryoten.tests.tests_cryoten.TestModelAngel
+* scipion3 tests cryoten.tests.tests_cryoten.TestCryoten
 
