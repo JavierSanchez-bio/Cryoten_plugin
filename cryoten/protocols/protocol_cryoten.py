@@ -4,6 +4,7 @@ from pyworkflow.constants import BETA
 import pyworkflow.protocol.params as params
 from pyworkflow.utils import Message
 from pwem.protocols import EMProtocol
+from pyworkflow.protocol import String
 from pwem.objects import Volume  # Import the Volume class to define the output
 
 
@@ -109,11 +110,12 @@ class CryotenPrefixEnhace(EMProtocol):
             stdout, stderr = run_command(command)
 
             # Log the output and error messages
-            print(f"Command output: {stdout}")
-            print(f"Command error: {stderr}")
+            # print(f"Command output: {stdout}")
+            # print(f"Command error: {stderr}")
 
             # Save the output file path for the next step
-            self.outputFilePath = outputFilePath
+            self.outputFilePath = String(outputFilePath)
+            self._store()
             print(f"Output file path set to: {self.outputFilePath}")
 
         except Exception as e:
@@ -121,6 +123,7 @@ class CryotenPrefixEnhace(EMProtocol):
 
     def createOutputStep(self):
         """Create output volume and register it in Scipion."""
+        print(f"Output file path set to: {self.outputFilePath}")
         if not self.outputFilePath:
             raise RuntimeError("Output file path is not set. Ensure runShellCommandsStep has been executed successfully.")
 
@@ -134,6 +137,8 @@ class CryotenPrefixEnhace(EMProtocol):
         self._defineOutputs(outputVolume=outputVolume)
         self._defineSourceRelation(self.inputVolume, outputVolume)
 
+        
+
     # --------------------------- INFO functions -----------------------------------
     def _validate(self):
         errors = []
@@ -142,6 +147,7 @@ class CryotenPrefixEnhace(EMProtocol):
     def _summary(self):
         """ Summarize what the protocol has done"""
         summary = []
+        summary.append(f"Output file path set to: {self.outputFilePath}")
         return summary
 
     def _methods(self):
