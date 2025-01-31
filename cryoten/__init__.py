@@ -63,14 +63,13 @@ class Plugin(pwem.Plugin):
 
     @classmethod
     def defineBinaries(cls, env):
-
         def getCryotenInstallationCommands():
             commands = cls.getCondaActivationCmd() + " "
             commands += "if [ ! -d cryoten ]; then git clone https://github.com/jianlin-cheng/cryoten; fi && "
             commands += "cd cryoten && "
             commands += "if [ ! -f cryoten.ckpt ]; then wget https://zenodo.org/records/12693785/files/cryoten.ckpt; fi && "
-            commands += "if [ ! -d /home/javier/miniconda/envs/cryoten_env ]; then conda env create -f environment.yaml; fi && "
-            commands += f"conda activate cryoten_env && "
+            commands += "conda env list | grep -q cryoten_env || conda env create -f environment.yaml && "
+            commands += "conda activate cryoten_env && "
             commands += "touch ../cryoten_installed"
             return commands
 
